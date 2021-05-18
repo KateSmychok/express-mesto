@@ -1,7 +1,7 @@
 {
   "name": "express-mesto",
   "version": "1.0.0",
-  "description": "",
+  "description": "Back-end of the project 'Mesto'",
   "main": "app.js",
   "scripts": {
     "dev": "nodemon app.js",
@@ -13,10 +13,6 @@
   "devDependencies": {
     "eslint": "^7.26.0",
     "eslint-config-airbnb": "^18.2.1",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsx-a11y": "^6.4.1",
-    "eslint-plugin-react": "^7.23.2",
-    "eslint-plugin-react-hooks": "^4.2.0",
     "nodemon": "^2.0.7"
   },
   "dependencies": {
