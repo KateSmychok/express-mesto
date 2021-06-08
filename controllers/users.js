@@ -1,7 +1,3 @@
-// Странно, у меня не было этой ошибки при запуске линтера.
-// Плагин eslint-plugin-import переустановила.
-// Вот скрин https://prnt.sc/134o9pn.
-
 const User = require('../models/user');
 
 const getUsers = (req, res) => {
