@@ -21,6 +21,12 @@ const getUser = (req, res) => {
     });
 };
 
+const getCurrentUserInfo = (req, res) => {
+  User.findOne(req.body.email)
+    .then((user) => res.status(200).send(user))
+    .catch(() => res.status(500).send({ message: 'Ошибка на сервере' }));
+}
+
 const createUser = (req, res) => {
   const { name, about, avatar, email, password } = req.body;
   bcrypt.hash(password, 10)
@@ -96,6 +102,7 @@ module.exports = {
   getUsers,
   getUser,
   createUser,
+  getCurrentUserInfo,
   updateUserInfo,
   updateAvatar,
   login,
