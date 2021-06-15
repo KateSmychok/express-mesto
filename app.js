@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const { errors } = require('celebrate');
 
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
@@ -23,8 +24,10 @@ app.post('/signup', createUser);
 app.use('/users', auth, require('./routes/users'));
 app.use('/cards', auth, require('./routes/cards'));
 
-// Централизованный обработчик ошибок
+// Обработчик ошибок при валидации
+app.use(errors());
 
+// Централизованный обработчик ошибок
 app.use(errorHandler);
 
 const { PORT = 3000 } = process.env;
