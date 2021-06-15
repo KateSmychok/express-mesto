@@ -1,73 +1,92 @@
 const Card = require('../models/card');
+const NotFoundError = require('../errors/not-found-err');
+const BadRequestError = require('../errors/bad-request-err');
+const ForbiddenError = require('../errors/forbidden-err');
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
-    .then((cards) => res.status(200).send(cards))
-    .catch(() => res.status(500).send({ message: 'Ошибка на сервере' }));
+    .then((cards) => res.send(cards))
+    .catch(next);
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const { owner } = req.user._id;
 
   Card.create({ name, link, owner })
-    .then((card) => res.status(200).send(card))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при создании карточки' });
+        next(new BadRequestError('Переданы некорректные данные при создании карточки'));
       } else {
-        res.status(500).send({ message: 'Ошибка на сервере' });
+        next(err);
       }
     });
 };
 
-const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    .orFail(new Error('NotFound'))
-    .then((card) => res.status(200).send(card))
+const deleteCard = (req, res, next) => {
+  const { cardId } = req.params;
+
+  Card.findById(cardId)
+    .orFail(new NotFoundError('Карточка с указанным id не найдена'))
+    .then((card) => {
+      if (!card.owner.equals(req.user._id)) {
+        return next(new ForbiddenError('Чужую карточку удалить нельзя'));
+      } else {
+        return card.remove()
+          .then((card) =>
+            res.send(card)
+          )
+          .catch(next);
+      }
+    })
     .catch((err) => {
-      if (err.message === 'NotFound' || err.name === 'CastError') {
-        res.status(404).send({ message: 'Карточка с указанным id не найдена' });
+      if (err.name === 'CastError') {
+        next(new NotFoundError('Карточка с указанным id не найдена'));
       } else {
-        res.status(500).send({ message: 'Ошибка на сервере' });
+        next(err);
       }
     });
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
+  const { cardId } = req.params;
+
   Card.findByIdAndUpdate(
-    req.params.cardId,
+    cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(new Error('NotValidId'))
-    .then((card) => res.status(200).send(card))
+    .orFail(new NotFoundError('Карточка с указанным id не найдена'))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.message === 'NotValidId') {
-        res.status(404).send({ message: 'Карточка с указанным id не найдена' });
+        next(new NotFoundError('Карточка с указанным id не найдена'));
       } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные для постановки лайка' });
+        next(new BadRequestError('Переданы некорректные данные для постановки лайка'));
       } else {
-        res.status(500).send({ message: 'Ошибка на сервере' });
+        next(err);
       }
     });
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
+  const { cardId } = req.params;
+
   Card.findByIdAndUpdate(
-    req.params.cardId,
+    cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(new Error('NotValidId'))
-    .then((card) => res.status(200).send(card))
+    .orFail(new NotFoundError('Карточка с указанным id не найдена'))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.message === 'NotValidId') {
-        res.status(404).send({ message: 'Карточка с указанным id не найдена' });
+        next(new NotFoundError('Карточка с указанным id не найдена'));
       } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные для снятия лайка' });
+        next(new BadRequestError('Переданы некорректные данные для снятия лайка'));
       } else {
-        res.status(500).send({ message: 'Ошибка на сервере' });
+        next(err);
       }
     });
 };
