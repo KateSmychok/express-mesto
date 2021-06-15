@@ -22,9 +22,6 @@ const validateUserBody = celebrate({
           return value;
         }
         return helpers.message('Невалидный URL');
-      })
-      .messages({
-        'any.required': 'Поле "email" обязательно должно быть заполнено',
       }),
 
     email: Joi.string().required().email()
@@ -42,7 +39,7 @@ const validateUserBody = celebrate({
       .messages({
         'any.required': 'Поле "password" обязательно должно быть заполнено',
       }),
-  })
+  }).unknown(true),
 });
 
 const validateUserId = celebrate({
@@ -54,11 +51,54 @@ const validateUserId = celebrate({
       }
       return helpers.message('Невалидный id');
     }),
-  })
+  }).unknown(true),
 });
 
 const validateUserHeaders = celebrate({
   headers: Joi.object().keys({
     authorization: Joi.string().required(),
-  })
-})
+  }).unknown(true),
+});
+
+const validateCardBody = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).required()
+      .messages({
+        'string.min': 'Минимальная длина поля "name" - 2',
+        'string.max': 'Максимальная длина поля "name" - 30',
+        'any.required': 'Поле "name" обязательно должно быть заполнено',
+      }),
+
+    link: Joi.string().required()
+      .pattern(/^(https?:\/\/)(www\.)?([\da-z-.]+)\.([a-z.]{2,6})[\da-zA-Z-._~:?#[\]@!$&'()*+,;=/]*\.(jpg|jpeg|png|gif)$/i)
+      .custom((value, helpers) => {
+        if (validator.isURL(value)) {
+          return value;
+        }
+        return helpers.message('Невалидный URL');
+      })
+      .messages({
+        'any.required': 'Поле "link" обязательно должно быть заполнено',
+      }),
+  }).unknown(true),
+});
+
+const validateCardId = celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().required()
+      .custom((value, helpers) => {
+        if (ObjectId.isValid(value)) {
+          return value;
+        }
+        return helpers.message('Невалидный id');
+      }),
+  }).unknown(true),
+});
+
+module.exports = {
+  validateUserBody,
+  validateUserId,
+  validateUserHeaders,
+  validateCardBody,
+  validateCardId,
+};

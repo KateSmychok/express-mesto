@@ -3,9 +3,18 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
 
-const { createUser, login } = require('./controllers/users');
+const {
+  createUser,
+  login,
+} = require('./controllers/users');
+
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/error-handler');
+
+const {
+  validateUserBody,
+  validateUserHeaders,
+} = require('./middlewares/validators');
 
 const app = express();
 
@@ -18,8 +27,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signin', validateUserHeaders, validateUserBody, login);
+app.post('/signup', validateUserBody, createUser);
 
 app.use('/users', auth, require('./routes/users'));
 app.use('/cards', auth, require('./routes/cards'));
