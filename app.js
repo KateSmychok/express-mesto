@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const errorHandler = require('./middlewares/error-handler');
 
 const app = express();
 
@@ -19,10 +20,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.post('/signin', login);
 app.post('/signup', createUser);
 
-app.use(auth);
+app.use('/users', auth, require('./routes/users'));
+app.use('/cards', auth, require('./routes/cards'));
 
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
+// Централизованный обработчик ошибок
+
+app.use(errorHandler);
 
 const { PORT = 3000 } = process.env;
 
