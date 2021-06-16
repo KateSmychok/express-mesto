@@ -6,11 +6,11 @@ const validateEmailAndPassword = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email()
       .custom((value, helpers) => {
-      if (validator.isEmail(value)) {
-        return value;
-      }
-      return helpers.message('Невалидный email');
-    })
+        if (validator.isEmail(value)) {
+          return value;
+        }
+        return helpers.message('Невалидный email');
+      })
       .messages({
         'any.required': 'Поле "email" обязательно должно быть заполнено',
       }),
@@ -55,11 +55,11 @@ const validateUserId = celebrate({
   params: Joi.object().keys({
     userId: Joi.string().required()
       .custom((value, helpers) => {
-      if (ObjectId.isValid(value)) {
-        return value;
-      }
-      return helpers.message('Невалидный id');
-    }),
+        if (ObjectId.isValid(value)) {
+          return value;
+        }
+        return helpers.message('Невалидный id');
+      }),
   }).unknown(true),
 });
 

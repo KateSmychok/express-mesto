@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-request-err');
 const ConflictingRequestError = require('../errors/conflicting-request-err');
@@ -16,12 +17,12 @@ const getUser = (req, res, next) => {
     .orFail(new NotFoundError('Пользователь с указанным id не найден'))
     .then((user) => res.send(user))
     .catch((err) => {
-        if (err.message === 'NotValidId' || err.name === 'CastError') {
-          next(new NotFoundError('Пользователь с указанным id не найден'));
-        } else {
-          next(err);
-        }
-      });
+      if (err.message === 'NotValidId' || err.name === 'CastError') {
+        next(new NotFoundError('Пользователь с указанным id не найден'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const getCurrentUser = (req, res, next) => {
@@ -38,19 +39,31 @@ const getCurrentUser = (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
 
   if (!email || !password) {
     throw new BadRequestError('Отсутствует электронная почта или пароль');
   }
 
   bcrypt.hash(password, 10)
-    .then(hash => User.create({ name, about, avatar, email, password: hash }))
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
-      } else if (err.name === "MongoError" && err.code === 11000) {
+      } else if (err.name === 'MongoError' && err.code === 11000) {
         next(new ConflictingRequestError('Пользователь с указанной электронной почтой уже существует'));
       } else {
         next(err);
@@ -124,14 +137,15 @@ const login = (req, res, next) => {
       const token = jwt.sign(
         { _id: user._id },
         'secret-key',
-        { expiresIn: '7d' }
-        );
-      res.cookie('jwt', token, {
+        { expiresIn: '7d' },
+      );
+      res
+        .cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true,
           sameSite: true,
         })
-      res.send({ token });
+        .send({ token });
     })
     .catch(next);
 };
