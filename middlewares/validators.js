@@ -1,29 +1,9 @@
 const { celebrate, Joi } = require('celebrate');
 const { ObjectId } = require('mongoose').Types;
+const validator = require('validator');
 
-const validateUserBody = celebrate({
+const validateEmailAndPassword = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30)
-      .messages({
-        'string.min': 'Минимальная длина поля "name" - 2',
-        'string.max': 'Максимальная длина поля "name" - 30',
-      }),
-
-    about: Joi.string().min(2).max(30)
-      .messages({
-        'string.min': 'Минимальная длина поля "about" - 2',
-        'string.max': 'Максимальная длина поля "about" - 30',
-      }),
-
-    avatar: Joi.string()
-      .pattern(/^(https?:\/\/)(www\.)?([\da-z-.]+)\.([a-z.]{2,6})[\da-zA-Z-._~:?#[\]@!$&'()*+,;=/]*\.(jpg|jpeg|png|gif)$/i)
-      .custom((value, helpers) => {
-        if (validator.isURL(value)) {
-          return value;
-        }
-        return helpers.message('Невалидный URL');
-      }),
-
     email: Joi.string().required().email()
       .custom((value, helpers) => {
       if (validator.isEmail(value)) {
@@ -42,6 +22,35 @@ const validateUserBody = celebrate({
   }).unknown(true),
 });
 
+const validateNameAndAbout = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30)
+      .messages({
+        'string.min': 'Минимальная длина поля "name" - 2',
+        'string.max': 'Максимальная длина поля "name" - 30',
+      }),
+
+    about: Joi.string().min(2).max(30)
+      .messages({
+        'string.min': 'Минимальная длина поля "about" - 2',
+        'string.max': 'Максимальная длина поля "about" - 30',
+      }),
+  }).unknown(true),
+});
+
+const validateAvatar = celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string()
+      .pattern(/^(https?:\/\/)(www\.)?([\da-z-.]+)\.([a-z.]{2,6})[\da-zA-Z-._~:?#[\]@!$&'()*+,;=/]*\.(jpg|jpeg|png|gif)$/i)
+      .custom((value, helpers) => {
+        if (validator.isURL(value)) {
+          return value;
+        }
+        return helpers.message('Невалидный URL');
+      }),
+  }),
+});
+
 const validateUserId = celebrate({
   params: Joi.object().keys({
     userId: Joi.string().required()
@@ -51,12 +60,6 @@ const validateUserId = celebrate({
       }
       return helpers.message('Невалидный id');
     }),
-  }).unknown(true),
-});
-
-const validateUserHeaders = celebrate({
-  headers: Joi.object().keys({
-    authorization: Joi.string().required(),
   }).unknown(true),
 });
 
@@ -95,10 +98,18 @@ const validateCardId = celebrate({
   }).unknown(true),
 });
 
+const validateToken = celebrate({
+  headers: Joi.object().keys({
+    authorization: Joi.string().required(),
+  }).unknown(true),
+});
+
 module.exports = {
-  validateUserBody,
+  validateEmailAndPassword,
+  validateNameAndAbout,
+  validateAvatar,
   validateUserId,
-  validateUserHeaders,
   validateCardBody,
   validateCardId,
+  validateToken,
 };

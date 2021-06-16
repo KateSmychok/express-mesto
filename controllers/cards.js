@@ -11,7 +11,7 @@ const getCards = (req, res, next) => {
 
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
-  const { owner } = req.user._id;
+  const owner = req.user._id;
 
   Card.create({ name, link, owner })
     .then((card) => res.send(card))
@@ -38,7 +38,7 @@ const deleteCard = (req, res, next) => {
             res.send(card)
           )
           .catch(next);
-      }
+        }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
