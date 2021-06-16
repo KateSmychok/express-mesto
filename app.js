@@ -10,8 +10,9 @@ const {
 
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/error-handler');
-
 const { validateEmailAndPassword } = require('./middlewares/validators');
+
+const NotFoundError = require('./errors/not-found-err');
 
 const app = express();
 
@@ -19,6 +20,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
+  useUnifiedTopology: true,
 });
 
 app.use(bodyParser.json());
@@ -29,6 +31,10 @@ app.post('/signup', validateEmailAndPassword, createUser);
 
 app.use('/users', auth, require('./routes/users'));
 app.use('/cards', auth, require('./routes/cards'));
+
+app.use('*', () => {
+  throw new NotFoundError('Страница не найдена');
+});
 
 // Обработчик ошибок при валидации
 app.use(errors());

@@ -24,16 +24,18 @@ const validateEmailAndPassword = celebrate({
 
 const validateNameAndAbout = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30)
+    name: Joi.string().min(2).max(30).required()
       .messages({
         'string.min': 'Минимальная длина поля "name" - 2',
         'string.max': 'Максимальная длина поля "name" - 30',
+        'any.required': 'Поле "name" обязательно должно быть заполнено',
       }),
 
-    about: Joi.string().min(2).max(30)
+    about: Joi.string().min(2).max(30).required()
       .messages({
         'string.min': 'Минимальная длина поля "about" - 2',
         'string.max': 'Максимальная длина поля "about" - 30',
+        'any.required': 'Поле "about" обязательно должно быть заполнено',
       }),
   }).unknown(true),
 });
