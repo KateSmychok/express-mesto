@@ -13,10 +13,22 @@ const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/error-handler');
 const { validateEmailAndPassword } = require('./middlewares/validators');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-
 const NotFoundError = require('./errors/not-found-err');
 
 const app = express();
+
+const allowedOrigins = ['https://even-star.students.nomoredomains.monster', 'http://even-star.students.nomoredomains.monster'];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+};
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -30,10 +42,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger);
 
-app.use(cors());
+app.use(cors(corsOptions));
 
-app.post('/signin', validateEmailAndPassword, login);
-app.post('/signup', validateEmailAndPassword, createUser);
+app.post('/sign-in', validateEmailAndPassword, login);
+app.post('/sign-up', validateEmailAndPassword, createUser);
 
 app.use('/users', auth, require('./routes/users'));
 app.use('/cards', auth, require('./routes/cards'));
