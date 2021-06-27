@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
+const cors = require('cors');
 
 const {
   createUser,
@@ -12,11 +13,11 @@ const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/error-handler');
 const { validateEmailAndPassword } = require('./middlewares/validators');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const cors = require('./middlewares/cors');
 
 const NotFoundError = require('./errors/not-found-err');
 
 const app = express();
+app.use(cors());
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -25,14 +26,10 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 
-app.use(cors());
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger);
-
-app.use(cors());
 
 app.post('/signin', validateEmailAndPassword, login);
 app.post('/signup', validateEmailAndPassword, createUser);
