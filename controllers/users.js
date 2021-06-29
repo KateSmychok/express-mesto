@@ -151,6 +151,11 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
+const logout = (req, res) => {
+  res.clearCookie('jwt');
+  return res.sendStatus(200);
+};
+
 module.exports = {
   getUsers,
   getUser,
@@ -159,4 +164,5 @@ module.exports = {
   updateUserInfo,
   updateAvatar,
   login,
+  logout,
 };

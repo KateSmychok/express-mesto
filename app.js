@@ -7,6 +7,7 @@ const cors = require('cors');
 const {
   createUser,
   login,
+  logout,
 } = require('./controllers/users');
 
 const auth = require('./middlewares/auth');
@@ -41,6 +42,7 @@ app.options('*', cors(corsOptions));
 
 app.post('/sign-in', validateEmailAndPassword, login);
 app.post('/sign-up', validateEmailAndPassword, createUser);
+app.delete('/sign-out', logout);
 
 app.use('/users', auth, require('./routes/users'));
 app.use('/cards', auth, require('./routes/cards'));
