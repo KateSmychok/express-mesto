@@ -42,7 +42,7 @@ app.options('*', cors(corsOptions));
 
 app.post('/sign-in', validateEmailAndPassword, login);
 app.post('/sign-up', validateEmailAndPassword, createUser);
-app.delete('/sign-out', logout);
+app.post('/sign-out', logout);
 
 app.use('/users', auth, require('./routes/users'));
 app.use('/cards', auth, require('./routes/cards'));
