@@ -153,7 +153,7 @@ const login = (req, res, next) => {
 
 const logout = (req, res) => {
   res.clearCookie('jwt');
-  return res.sendStatus(200);
+  return res.status(200).send('User logged out');
 };
 
 module.exports = {
