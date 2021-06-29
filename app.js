@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
+const cors = require('cors');
 
 const {
   createUser,
@@ -13,6 +14,13 @@ const errorHandler = require('./middlewares/error-handler');
 const { validateEmailAndPassword } = require('./middlewares/validators');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFoundError = require('./errors/not-found-err');
+
+const corsOptions = {
+  origin: ['https://even-star.students.nomoredomains.monster'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Allow-Methods', 'Access-Control-Request-Headers'],
+  credentials: true,
+  enablePreflight: true,
+};
 
 const app = express();
 
@@ -28,14 +36,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger);
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://even-star.students.nomoredomains.monster');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Access-Control-Allow-Methods, Access-Control-Allow-Origin, Access-Control-Allow-Credentials, Access-Control-Request-Headers');
-  res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Credentials', 'true');
-
-  next();
-});
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.post('/sign-in', validateEmailAndPassword, login);
 app.post('/sign-up', validateEmailAndPassword, createUser);
