@@ -43,7 +43,6 @@ const validateNameAndAbout = celebrate({
 const validateAvatar = celebrate({
   body: Joi.object().keys({
     avatar: Joi.string()
-      .pattern(/^(https?:\/\/)(www\.)?([\da-z-.]+)\.([a-z.]{2,6})[\da-zA-Z-._~:?#[\]@!$&'()*+,;=/]*\.(jpg|jpeg|png|gif)$/i)
       .custom((value, helpers) => {
         if (validator.isURL(value)) {
           return value;
@@ -75,7 +74,6 @@ const validateCardBody = celebrate({
       }),
 
     link: Joi.string().required()
-      .pattern(/^(https?:\/\/)(www\.)?([\da-z-.]+)\.([a-z.]{2,6})[\da-zA-Z-._~:?#[\]@!$&'()*+,;=/]*\.(jpg|jpeg|png|gif)$/i)
       .custom((value, helpers) => {
         if (validator.isURL(value)) {
           return value;
