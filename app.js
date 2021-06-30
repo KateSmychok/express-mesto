@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
+const cors = require('cors');
 
 const {
   createUser,
@@ -14,6 +15,13 @@ const errorHandler = require('./middlewares/error-handler');
 const { validateEmailAndPassword } = require('./middlewares/validators');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFoundError = require('./errors/not-found-err');
+
+const corsOptions = {
+  origin: ['https://even-star.students.nomoredomains.monster'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Allow-Methods', 'Access-Control-Request-Headers'],
+  credentials: true,
+  enablePreflight: true,
+};
 
 const app = express();
 
@@ -28,6 +36,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger);
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.post('/sign-in', validateEmailAndPassword, login);
 app.post('/sign-up', validateEmailAndPassword, createUser);
