@@ -144,7 +144,8 @@ const login = (req, res, next) => {
         .cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true,
-          sameSite: true,
+          secure: true,
+          sameSite: 'none',
         })
         .send({ token });
     })
@@ -152,8 +153,12 @@ const login = (req, res, next) => {
 };
 
 const logout = (req, res) => {
-  res.clearCookie('jwt');
-  return res.status(200).send('User logged out');
+  res.clearCookie('jwt', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+  })
+    .send({ message: 'User logged out' });
 };
 
 module.exports = {
