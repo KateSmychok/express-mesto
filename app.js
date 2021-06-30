@@ -38,6 +38,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger);
 
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://even-star.students.nomoredomains.monster');
+  next();
+});
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
