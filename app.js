@@ -38,12 +38,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger);
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://even-star.students.nomoredomains.monster');
-  next();
-});
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 
 app.post('/sign-in', validateEmailAndPassword, login);
 app.post('/sign-up', validateEmailAndPassword, createUser);
