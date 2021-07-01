@@ -47,9 +47,9 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post('/sign-in', validateEmailAndPassword, login);
-app.post('/sign-up', validateEmailAndPassword, createUser);
-app.get('/sign-out', logout);
+app.post('/signin', validateEmailAndPassword, login);
+app.post('/signup', validateEmailAndPassword, createUser);
+app.get('/signout', logout);
 
 app.use('/users', auth, require('./routes/users'));
 app.use('/cards', auth, require('./routes/cards'));
