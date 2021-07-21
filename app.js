@@ -5,11 +5,11 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
-const routes = require('./routes/index');
 const { errors } = require('celebrate');
 const errorHandler = require('./middlewares/error-handler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { MONGODB_URL, PORT } = require('./config');
+const routes = require('./routes/index');
 
 const app = express();
 
