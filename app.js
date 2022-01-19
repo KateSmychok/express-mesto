@@ -2,14 +2,14 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const { errors } = require('celebrate');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const cors = require('cors');
-const { errors } = require('celebrate');
+const routes = require('./routes/index');
 const errorHandler = require('./middlewares/error-handler');
+const { passCors } = require('./middlewares/cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { MONGODB_URL, PORT } = require('./config');
-const routes = require('./routes/index');
 
 const app = express();
 
@@ -18,13 +18,6 @@ const limiter = rateLimit({
   max: 1000,
 });
 
-const corsOptions = {
-  origin: ['https://even-star.students.nomoredomains.monster'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Allow-Methods', 'Access-Control-Request-Headers'],
-  credentials: true,
-  enablePreflight: true,
-};
-
 mongoose.connect(MONGODB_URL, {
   useNewUrlParser: true,
   useCreateIndex: true,
@@ -32,9 +25,8 @@ mongoose.connect(MONGODB_URL, {
   useUnifiedTopology: true,
 });
 
+app.use(passCors);
 app.use(requestLogger);
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
 app.use(helmet());
 app.use(limiter);
 app.use(bodyParser.json());

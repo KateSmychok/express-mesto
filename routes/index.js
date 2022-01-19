@@ -16,6 +16,7 @@ router.post('/signin', validateEmailAndPassword, login);
 router.post('/signout', logout);
 router.use('/users', auth, userRouter);
 router.use('/cards', auth, cardRouter);
+
 router.use('*', () => {
   throw new NotFoundError('Страница не найдена');
 });
